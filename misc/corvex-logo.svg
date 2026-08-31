@@ -1,0 +1,37 @@
+<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F28"/>
+      <stop offset="100%" stop-color="#4F6BEB"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4F6BEB"/>
+      <stop offset="50%" stop-color="#D4A017"/>
+      <stop offset="100%" stop-color="#2DD4BF"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(72, 100) scale(0.28)">
+    <path fill="url(#markGrad)"
+          d="M 95 -55 L 95 95 C 95 145, 55 175, 5 175 C -55 175, -105 125, -105 55
+             C -105 -15, -55 -65, 5 -65 C 35 -65, 60 -55, 75 -40 L 95 -55 Z
+             M 30 -25 C -5 -25, -35 5, -35 55 C -35 105, -5 135, 30 135
+             C 55 135, 70 120, 70 95 L 70 -25 C 55 -25, 40 -25, 30 -25 Z"/>
+    <path fill="#D4A017" d="M 95 -55 L 145 -85 L 108 -35 Z"/>
+    <circle cx="25" cy="15" r="14" fill="#D4A017"/>
+    <circle cx="28" cy="12" r="5" fill="#1A1F28"/>
+  </g>
+
+  <text x="130" y="95" font-family="system-ui, Arial, sans-serif" font-size="36" font-weight="700" fill="#1A1F28">Cor</text>
+  <text x="130" y="130" font-family="system-ui, Arial, sans-serif" font-size="36" font-weight="700" fill="url(#textGrad)">vex</text>
+
+  <circle cx="55" cy="55" r="2.5" fill="#4F6BEB" opacity="0.7">
+    <animateTransform attributeName="transform" type="rotate" from="0 72 100" to="360 72 100" dur="18s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="55" cy="145" r="2.5" fill="#D4A017" opacity="0.7">
+    <animateTransform attributeName="transform" type="rotate" from="0 72 100" to="-360 72 100" dur="14s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="89" cy="145" r="2.5" fill="#2DD4BF" opacity="0.7">
+    <animateTransform attributeName="transform" type="rotate" from="0 72 100" to="360 72 100" dur="22s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -1,0 +1,310 @@
+# Using Corvex as an MCP Server
+
+Corvex can run as an MCP (Model Context Protocol) server, making its analysis and planning tools available to any MCP client — Claude Code, Claude Desktop, Cursor, or any other compatible tool.
+
+## Setup
+
+### 1. Install Corvex with MCP support
+
+```bash
+pip install -e .                 # includes MCP support
+pip install -e ".[ui]"           # MCP + Streamlit UI
+pip install -e ".[all]"          # everything (UI + simulation)
+```
+
+### 2a. Claude Code — register the MCP server
+
+```bash
+claude mcp add corvex -s user \
+  -e GEMINI_API_KEY=your-gemini-key \
+  -e UNSAFE_EXECUTION_OK=true \
+  -e "PATH=$(dirname $(which python)):$PATH" \
+  -- $(which corvex) serve --mode analyze
+```
+
+**Flags explained:**
+- `-s user` — available from any directory (use `-s project` to limit to one repo)
+- `-e GEMINI_API_KEY=...` — API key for the LLM backend (also supports `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`)
+- `-e UNSAFE_EXECUTION_OK=true` — allows code execution without a sandbox prompt (required since there's no terminal to approve interactively)
+- `-e PATH=...` — ensures the `python` command is found during code execution
+- `--mode analyze` — expose analysis tools (use `plan` for planning tools, or `both` for all)
+
+Restart Claude Code after adding.
+
+### 2b. Claude Desktop — edit config
+
+Generate the entry instead of hand-writing it — it is secret-free by design:
+
+```bash
+corvex serve --print-mcp-json --mode analyze --session-dir ~/corvex_sessions/desktop
+```
+
+Paste the printed `mcpServers` block into
+`~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or
+`%APPDATA%\Claude\claude_desktop_config.json` (Windows) and restart Claude
+Desktop. When `uvx` is on PATH the entry is **zero-install** (the machine
+only needs [uv](https://docs.astral.sh/uv/)); otherwise it points at this
+installation's `corvex` executable.
+
+**Credentials go in one file, not in client configs:** put `KEY=VALUE`
+lines (e.g. `ANTHROPIC_API_KEY=...` or `AWS_BEARER_TOKEN_BEDROCK=...` +
+`AWS_REGION_NAME=...`) in `~/.corvex/credentials.env`. The server loads it
+at startup; an explicitly exported variable always wins. This removes the
+old need for `env` blocks with secrets in every client's config.
+
+### 2c. SSE transport — any MCP client
+
+Start the server as a long-lived HTTP service:
+
+```bash
+corvex serve --mode analyze --transport sse --port 8000
+```
+
+Then connect your MCP client to `http://127.0.0.1:8000/sse`.
+
+### 2d. Direct command
+
+Corvex also installs a `corvex-mcp` entry point that goes directly to the server:
+
+```bash
+corvex-mcp --mode analyze                         # stdio (default)
+corvex-mcp --mode both --transport sse --port 8000  # SSE
+```
+
+## Available tools
+
+### Analysis tools
+
+| Tool | Description |
+|------|-------------|
+| `corvex_examine_data` | Inspect a data file (type, shape, suggested agents) |
+| `corvex_convert_metadata` | Convert a text description to structured metadata |
+| `corvex_load_metadata` | Load metadata from a JSON file or directory |
+| `corvex_select_agent` | Choose an analysis agent (FFT, SAM, Hyperspectral, CurveFitting) |
+| `corvex_preview_image` | Preview a microscopy image |
+| `corvex_run_analysis` | Run analysis with the selected agent |
+| `corvex_list_results` | List completed analyses in the session |
+| `corvex_get_recommendations` | Get follow-up experiment suggestions |
+| `corvex_assess_novelty` | Literature search for novelty of findings |
+| `corvex_synthesize_knowledge` | Build reusable knowledge from results |
+| `corvex_save_checkpoint` | Save session state |
+| `corvex_show_available_agents` | List available analysis agents |
+| `corvex_set_preprocessing_instruction` | Add custom preprocessing steps |
+| `corvex_get_metadata_schema` | View required/optional metadata fields |
+| `corvex_list_knowledge` | List active knowledge entries |
+| `corvex_clear_knowledge` | Remove knowledge entries |
+| `corvex_graduate_to_skill` | Convert a knowledge entry into a reusable skill |
+| `corvex_update_skill` | Update an existing graduated skill with new knowledge |
+| `corvex_save_file` | Save text content to a file in the session directory |
+
+### Planning tools
+
+Available with `--mode plan` or `--mode both`:
+
+| Tool | Description |
+|------|-------------|
+| `corvex_list_workspace_files` | List files in the session directory |
+| `corvex_generate_initial_plan` | Generate an experimental plan |
+| `corvex_generate_implementation_code` | Add implementation code to a plan |
+| `corvex_run_economic_analysis` | Techno-economic analysis |
+| `corvex_refine_plan_with_results` | Refine plan based on results |
+| `corvex_refine_implementation_code` | Update implementation code |
+| `corvex_analyze_file` | Analyze a result file for optimization |
+| `corvex_analyze_batch` | Batch analysis for optimization |
+| `corvex_reset_analysis_logic` | Reset the scalarizer |
+| `corvex_run_optimization` | Run Bayesian optimization |
+| `corvex_plan_save_checkpoint` | Save planning session state |
+| `corvex_discard_plan` | Discard the current plan |
+| `corvex_show_directory_guide` | Show project directory structure |
+| `corvex_plan_read_file` | Read a file from the workspace |
+| `corvex_adjust_plan_for_constraints` | Adjust plan for implementation constraints |
+| `corvex_plan_save_file` | Save text content to the session directory |
+| `corvex_plan_synthesize_knowledge` | Distill findings from planning iterations into knowledge |
+| `corvex_plan_list_knowledge` | List active knowledge entries |
+| `corvex_plan_clear_knowledge` | Remove knowledge entries |
+| `corvex_plan_graduate_to_skill` | Convert knowledge into a reusable skill |
+| `corvex_plan_update_skill` | Update an existing graduated skill |
+
+### Session management tools
+
+| Tool | Description |
+|------|-------------|
+| `corvex_set_autonomy` | Switch between autonomous/autopilot/co-pilot modes at runtime |
+| `corvex_respond` | Approve or reject a pending action (co-pilot/autopilot modes) |
+| `corvex_job_status` | Check status of a background job |
+| `corvex_job_result` | Retrieve result of a completed background job |
+
+### Orchestrator tools
+
+| Tool | Description |
+|------|-------------|
+| `corvex_orchestrate_analysis` | Delegate a complete analysis workflow to Corvex's analysis orchestrator via natural language |
+| `corvex_orchestrate_planning` | Delegate a complete planning workflow to Corvex's planning orchestrator via natural language |
+
+These tools wrap the full orchestrator chat loop. Instead of calling individual tools one by one (examine_data, select_agent, run_analysis, etc.), send a single natural-language prompt and the orchestrator handles the entire multi-step workflow using its domain-specific system prompt. Use `background=true` for non-trivial requests — the orchestrator may chain several internal tool calls and take minutes to complete.
+
+## Usage examples
+
+Just chat naturally. The LLM calls Corvex tools automatically.
+
+### Analyze a spectrum
+
+```
+Examine /path/to/xps_data.csv and tell me what kind of data it is
+```
+
+### Set metadata and run analysis
+
+```
+This is XPS Ti 2p data from a TiO2 thin film collected with Al K-alpha at 1486.6 eV.
+Load the metadata, select the curve fitting agent, and analyze with the xps skill.
+```
+
+### Run analysis in background (avoids timeouts)
+
+```
+Run analysis on the current data with background=true
+```
+
+Then the LLM will poll with `corvex_job_status` and retrieve with `corvex_job_result`.
+
+### Analyze a microscopy image
+
+```
+Examine /path/to/sem_image.tif, preview it, and run particle segmentation
+```
+
+### Batch analysis
+
+```
+Examine the directory /path/to/spectra/ and run a series analysis
+with temperature as the control variable
+```
+
+### Get follow-up suggestions
+
+```
+List my analysis results and get measurement recommendations for the most recent one
+```
+
+## Server options
+
+```bash
+corvex serve --help
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--model` | `gemini-3.1-pro-preview` | LLM model for analysis agents |
+| `--mode` | `both` | `analyze`, `plan`, or `both` |
+| `--autonomy` | `autonomous` | `autonomous`, `autopilot`, or `co-pilot` |
+| `--transport` | `stdio` | `stdio` or `sse` |
+| `--host` | `127.0.0.1` | Bind address (SSE only) |
+| `--port` | `8000` | Bind port (SSE only) |
+| `--session-dir` | auto-generated | Directory for session outputs |
+| `--api-key` | from env vars | Override API key |
+| `--base-url` | none | OpenAI-compatible endpoint |
+| `--futurehouse-key` | from env vars | FutureHouse/Edison API key |
+| `--hitl-timeout` | `1800` | Seconds a question waits for `corvex_respond` before its default answer |
+| `--print-mcp-json` | — | Print a ready-to-paste, secret-free `.mcp.json` entry and exit |
+
+## What the client sees while tools run
+
+- **Live narration.** Foreground tool calls stream their progress lines to
+  the client as MCP log notifications (`notifications/message`, logger
+  `corvex`) while they run; clients that render log messages show Corvex
+  working in real time. Disable with `CORVEX_MCP_NARRATION=0`. Background
+  jobs additionally expose the same narration via `log_tail` on
+  `corvex_job_status`.
+- **Restart durability.** Every tool call checkpoints the session; a server
+  restarted on the same `--session-dir` resumes the campaign. Background
+  jobs and parked questions are persisted too: after a restart an
+  unfinished job reports status `interrupted` with a re-entry hint instead
+  of "unknown job", and finished jobs still return their results.
+- **Self-describing results.** Analysis responses carry
+  `feature_columns` / `feature_rows` / `feature_missing` alongside the
+  `feature_table` path, so remote clients can wire results into
+  optimization without reading server files.
+- **Explicit campaign facts.** The optimization tools accept
+  `directions={target: "maximize"|"minimize"}`,
+  `input_types={col: "categorical"|"continuous"}`,
+  `input_bounds={col: [min, max]}` and `seed` — each sticky for the
+  campaign, each echoed back in responses, with warnings whenever a
+  direction or search box had to be assumed.
+
+## Autonomy modes
+
+Control how much approval Corvex requires:
+
+```bash
+corvex serve --autonomy autonomous   # default — all tools run immediately
+corvex serve --autonomy autopilot   # high-impact tools pause for approval
+corvex serve --autonomy co-pilot     # most tools pause for approval
+```
+
+You can also switch at runtime by asking the LLM to call `corvex_set_autonomy`.
+
+In **autopilot** and **co-pilot** modes, high-impact tools return a `needs_input` response instead of executing. The MCP client calls `corvex_respond` with `"yes"` to approve or `"no"` to cancel.
+
+Tools that require approval:
+- **Co-pilot**: `run_analysis`, `select_agent`, `assess_novelty`, `get_recommendations`, `run_optimization`, `generate_initial_plan`, `generate_implementation_code`, `run_economic_analysis`, `discard_plan`
+- **Autopilot**: `run_analysis`, `run_optimization`, `discard_plan`
+
+## Background execution
+
+Long-running tools support an optional `background=true` parameter that returns a job ID immediately instead of blocking. This avoids timeouts in clients like Claude Desktop.
+
+Tools that support background execution:
+- `run_analysis`, `run_optimization` — full agent analysis or Bayesian optimization
+- `assess_novelty` — FutureHouse literature search per scientific claim
+- `get_recommendations` — measurement recommendations over a full analysis record
+- `generate_initial_plan`, `generate_implementation_code` — RAG + LLM generation
+- `run_economic_analysis` — technoeconomic analysis with knowledge retrieval
+- `orchestrate_analysis`, `orchestrate_planning` — full orchestrator chat loops
+
+```
+run_analysis(data_path="...", background=true)
+→ {"status": "started", "job_id": "job_20260308_130923_001"}
+
+job_status(job_id="job_20260308_130923_001")
+→ {"status": "running"} or {"status": "completed"}
+
+job_result(job_id="job_20260308_130923_001")
+→ full analysis result
+```
+
+## Session outputs
+
+Results are saved to `~/corvex_mcp_sessions/session_<timestamp>/`. Each analysis run creates a subdirectory with:
+- Fitted curves and plots
+- `analysis_results.json` with detailed findings
+- Scientific claims and recommendations
+
+## Troubleshooting
+
+### Server not connecting
+Verify the server works standalone:
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' | corvex serve --mode analyze 2>/dev/null
+```
+
+### `python` not found during analysis
+Ensure the `PATH` env var in the MCP config includes the directory containing `python`:
+```bash
+-e "PATH=$(dirname $(which python)):$PATH"
+```
+
+### Analysis times out (Claude Desktop)
+Claude Desktop has a ~4 minute timeout on tool calls. Use `background=true` for long-running analyses, or use Claude Code which has no timeout.
+
+### Tools not appearing
+- Run `claude mcp list` to verify the server is registered
+- Make sure `corvex serve` is available (`pip install -e .`)
+- Restart the client after adding the MCP server
+
+### Managing the server (Claude Code)
+```bash
+claude mcp list              # list configured servers
+claude mcp get corvex       # show config details
+claude mcp remove corvex    # remove the server
+```

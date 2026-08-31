@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 65 660 660" width="660" height="660">
+  <defs>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E6E9EF"/>
+      <stop offset="100%" stop-color="#8892A0"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6B84F5"/>
+      <stop offset="100%" stop-color="#8B9CF5"/>
+    </linearGradient>
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#1A1F28"/>
+      <stop offset="100%" stop-color="#13161B"/>
+    </radialGradient>
+    <filter id="markGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#4F6BEB" flood-opacity="0.25"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="70" y="65" width="660" height="660" fill="url(#bgGrad)"/>
+
+  <!-- Subtle hex frame -->
+  <polygon points="400,155 520,224 520,364 400,433 280,364 280,224"
+           fill="none" stroke="#343D4A" stroke-width="2" stroke-dasharray="10,8" opacity="0.7"/>
+
+  <!-- Angular C / raven mark -->
+  <g transform="translate(400, 330)" filter="url(#markGlow)">
+    <path fill="url(#markGrad)"
+          d="M 95 -55
+             L 95 95
+             C 95 145, 55 175, 5 175
+             C -55 175, -105 125, -105 55
+             C -105 -15, -55 -65, 5 -65
+             C 35 -65, 60 -55, 75 -40
+             L 95 -55 Z
+             M 30 -25
+             C -5 -25, -35 5, -35 55
+             C -35 105, -5 135, 30 135
+             C 55 135, 70 120, 70 95
+             L 70 -25
+             C 55 -25, 40 -25, 30 -25 Z"/>
+    <!-- Beak -->
+    <path fill="#E8BC4A" d="M 95 -55 L 145 -85 L 108 -35 Z"/>
+    <!-- Eye -->
+    <circle cx="25" cy="15" r="14" fill="#E8BC4A"/>
+    <circle cx="28" cy="12" r="5" fill="#13161B"/>
+    <!-- Wing feather cut -->
+    <path fill="none" stroke="url(#accentGrad)" stroke-width="4" stroke-linecap="round"
+          d="M 70 40 L 40 70 M 70 70 L 35 100 M 70 100 L 45 130"/>
+  </g>
+
+  <!-- Accent nodes -->
+  <circle cx="400" cy="175" r="7" fill="#6B84F5" opacity="0.9"/>
+  <circle cx="295" cy="395" r="7" fill="#E8BC4A" opacity="0.9"/>
+  <circle cx="505" cy="395" r="7" fill="#2DD4BF" opacity="0.9"/>
+
+  <!-- Wordmark -->
+  <text x="400" y="510" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"
+        font-size="72" font-weight="700" letter-spacing="4" fill="#E6E9EF">CORVEX</text>
+  <text x="400" y="555" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"
+        font-size="22" font-weight="500" letter-spacing="6" fill="#8892A0">AGENTIC SCIENCE</text>
+</svg>

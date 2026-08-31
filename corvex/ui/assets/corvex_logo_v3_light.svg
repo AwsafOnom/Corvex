@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 65 660 660" width="660" height="660">
+  <defs>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F28"/>
+      <stop offset="100%" stop-color="#343D4A"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4F6BEB"/>
+      <stop offset="100%" stop-color="#6B84F5"/>
+    </linearGradient>
+    <filter id="markShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#1A1F28" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Subtle hex frame -->
+  <polygon points="400,155 520,224 520,364 400,433 280,364 280,224"
+           fill="none" stroke="#C5CBD3" stroke-width="2" stroke-dasharray="10,8" opacity="0.55"/>
+
+  <!-- Angular C / raven mark -->
+  <g transform="translate(400, 330)" filter="url(#markShadow)">
+    <path fill="url(#markGrad)"
+          d="M 95 -55
+             L 95 95
+             C 95 145, 55 175, 5 175
+             C -55 175, -105 125, -105 55
+             C -105 -15, -55 -65, 5 -65
+             C 35 -65, 60 -55, 75 -40
+             L 95 -55 Z
+             M 30 -25
+             C -5 -25, -35 5, -35 55
+             C -35 105, -5 135, 30 135
+             C 55 135, 70 120, 70 95
+             L 70 -25
+             C 55 -25, 40 -25, 30 -25 Z"/>
+    <!-- Beak -->
+    <path fill="#D4A017" d="M 95 -55 L 145 -85 L 108 -35 Z"/>
+    <!-- Eye -->
+    <circle cx="25" cy="15" r="14" fill="#D4A017"/>
+    <circle cx="28" cy="12" r="5" fill="#1A1F28"/>
+    <!-- Wing feather cut -->
+    <path fill="none" stroke="url(#accentGrad)" stroke-width="4" stroke-linecap="round"
+          d="M 70 40 L 40 70 M 70 70 L 35 100 M 70 100 L 45 130"/>
+  </g>
+
+  <!-- Accent nodes -->
+  <circle cx="400" cy="175" r="7" fill="#4F6BEB" opacity="0.85"/>
+  <circle cx="295" cy="395" r="7" fill="#D4A017" opacity="0.85"/>
+  <circle cx="505" cy="395" r="7" fill="#2DD4BF" opacity="0.85"/>
+
+  <!-- Wordmark -->
+  <text x="400" y="510" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"
+        font-size="72" font-weight="700" letter-spacing="4" fill="#1A1F28">CORVEX</text>
+  <text x="400" y="555" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"
+        font-size="22" font-weight="500" letter-spacing="6" fill="#6B7585">AGENTIC SCIENCE</text>
+</svg>
