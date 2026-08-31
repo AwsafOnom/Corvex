@@ -663,9 +663,5 @@ under the same name (`graduate_to_skill`). In **autopilot** and **autonomous** m
 agent decides itself when an observation is worth graduating; in **co-pilot** it surfaces
 the candidate and asks first.
 
-## Credits
-
-Corvex is derived from [SciLink](https://github.com/ziatdinovmax/SciLink) by
-[Maxim Ziatdinov](https://github.com/ziatdinovmax). Changes in this fork are
 limited to rebranding and a Streamlit UI redesign. See [NOTICE](NOTICE) for the
 upstream copyright line and attribution details.
