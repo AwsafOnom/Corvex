@@ -144,7 +144,7 @@ result = analyzer.chat("Analyze ./stem_image.tif and generate scientific claims"
 
 ---
 
-![Scilink Reports]<img width="3154" height="1312" alt="report" src="https://github.com/user-attachments/assets/c0c5945d-eb73-4980-82a7-b57abceb1ffa" />
+<img width="3154" height="1312" alt="report" src="https://github.com/user-attachments/assets/c0c5945d-eb73-4980-82a7-b57abceb1ffa" />
 
 
 ---
